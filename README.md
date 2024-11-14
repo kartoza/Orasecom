@@ -1,6 +1,6 @@
 # Orasecom
 
-GeoNode template project. Generates a django project with GeoNode support.
+![image](https://github.com/user-attachments/assets/81170f01-8c48-4c25-b122-de048187acd3)
 
 ## Table of Contents
 
