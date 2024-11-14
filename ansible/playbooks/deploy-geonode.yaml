@@ -1,0 +1,6 @@
+---
+    
+- hosts: "{{ deploy_hosts }}"
+  tasks:
+  - include_role: 
+      name: geonode

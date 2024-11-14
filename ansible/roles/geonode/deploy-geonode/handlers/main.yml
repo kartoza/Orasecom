@@ -1,0 +1,6 @@
+---
+- name: Restart Docker Compose
+  command: docker-compose down && docker-compose up -d
+  args:
+    chdir: "{{ compose_project_dir }}"
+  when: docker_compose_changed
