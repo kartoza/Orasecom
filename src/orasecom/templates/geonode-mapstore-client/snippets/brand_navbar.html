@@ -1,0 +1,22 @@
+{% extends "geonode-mapstore-client/snippets/brand_navbar.html" %}
+{% load static %}
+{% block extra_style %}
+<style>
+ #gn-brand-navbar {
+  background-color: #0C5A8F;
+  background-size: 300px 70px;
+  background-position: left center;
+  background-position-x: 100px;
+ }
+ .gn-menu-list .nav-link {
+  color: white;
+ }
+ :root {
+  --gn-link-color: #FF8F31;
+  --gn-link-hover-color: #FF8F31;
+ }
+</style>
+{% endblock %}
+{% block logo_src %}
+{% static 'img/orasecom_logo.png' %}
+{% endblock %}
