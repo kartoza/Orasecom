@@ -2,4 +2,5 @@
   hosts: "{{ target_group | default('default_group') }}"
   gather_facts: no
   roles:
-    - geonode
+    - { role: deployment, tags: ["deploy"] }
+    - { role: repository_management, tags: ["repo"] }
