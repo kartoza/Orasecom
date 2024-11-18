@@ -1,2 +1,2 @@
-[servers]
+[default_group]
 orasecom ansible_host=192.168.0.10 ansible_user=root
