@@ -1,0 +1,16 @@
+---
+- name: Ensure Git is installed
+  become: yes
+  package:
+    name: git
+    state: present
+  tags: ["repo", "git"]
+
+- name: Clone or update the repository
+  git:
+    repo: "{{ git_repo_url }}"
+    dest: "{{ compose_project_dir }}"
+    version: "{{ git_repo_version }}"
+    force: yes
+    update: yes
+  tags: ["repo", "clone"]

@@ -38,3 +38,31 @@ To execute the playbook for production, use the following command:
 
 ```bash
 ansible-playbook -i inventories/ktz/prd/prd.inv playbook.yml
+```
+
+## Using Tags
+Tags allow you to selectively run specific tasks or roles within the playbook.
+
+### Deploy Application
+
+Use the deploy tag to focus on tasks related to application deployment, such as building Docker images and starting services:
+
+```bash
+ansible-playbook -i inventories/ktz/prd/prd.inv playbook.yml --tags "deploy"
+```
+
+### Update Repository
+
+Use the repo tag to update the repository to the latest main branch:
+
+```bash
+ansible-playbook -i inventories/ktz/prd/prd.inv playbook.yml --tags "repo"
+```
+
+### Skip Specific Tags
+
+If you want to skip certain operations, such as repository updates, use the --skip-tags option:
+
+```bash
+ansible-playbook -i inventories/ktz/prd/prd.inv playbook.yml --skip-tags "repo"
+```
