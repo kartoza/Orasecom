@@ -1,5 +1,0 @@
----
-docker_compose_version: "2.22.0"
-compose_project_dir: "/opt/oresecom"
-git_repo_url: "https://github.com/GeoNode/geonode.git"
-git_repo_version: "4.4.x"

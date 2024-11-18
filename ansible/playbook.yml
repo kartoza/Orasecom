@@ -1,0 +1,5 @@
+- name: Check Docker and pip installation on Server
+  hosts: "{{ target_group | default('default_group') }}"
+  gather_facts: no
+  roles:
+    - geonode
