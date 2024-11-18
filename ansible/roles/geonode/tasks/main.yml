@@ -1,0 +1,108 @@
+---
+- name: Check if Docker is installed
+  shell: |
+    if command -v docker > /dev/null 2>&1; then
+      echo "Docker is installed"
+    else
+      echo "Docker is not installed"
+    fi
+  register: docker_check
+
+- name: Display Docker installation status
+  debug:
+    msg: "{{ docker_check.stdout }}"
+
+- name: Check if pip is installed
+  shell: |
+    if command -v pip > /dev/null 2>&1; then
+      echo "pip is installed"
+    else
+      echo "pip is not installed"
+    fi
+  register: pip_check
+
+- name: Display pip installation status
+  debug:
+    msg: "{{ pip_check.stdout }}"
+
+- name: Install pip if not installed
+  become: yes
+  package:
+    name: python3-pip
+    state: present
+  when: "'pip is not installed' in pip_check.stdout"
+
+- name: Check if docker-compose is installed
+  shell: |
+    if docker-compose version > /dev/null 2>&1; then
+      echo "docker-compose is installed"
+    else
+      echo "docker-compose is not installed"
+    fi
+  register: docker_compose_check
+
+- name: Display docker-compose installation status
+  debug:
+    msg: "{{ docker_compose_check.stdout }}"
+
+- name: Install docker-compose if not installed
+  become: yes
+  apt:
+    name: docker-compose-plugin
+    state: present
+  when: "'docker-compose is not installed' in docker_compose_check.stdout"
+
+- name: Check if project directory exists
+  stat:
+    path: "{{ compose_project_dir }}"
+  register: project_dir_status
+
+- name: Create project directory
+  become: yes
+  file:
+    path: "{{ compose_project_dir }}"
+    state: directory
+    mode: '0755'
+  when: not project_dir_status.stat.exists
+
+- name: Change ownership of project directory
+  become: yes
+  ansible.builtin.command:
+    cmd: chown -R "{{ ansible_user }}" "{{ compose_project_dir }}"
+  when: 
+    - not project_dir_status.stat.exists
+    - ansible_user is defined
+
+- name: Check if .env file already exists
+  stat:
+    path: "{{ compose_project_dir }}/.env"
+  register: env_file_status
+
+- name: Clone the Git repository
+  git:
+    repo: "{{ git_repo_url }}"
+    dest: "{{ compose_project_dir }}"
+    version: "{{ git_repo_version }}"
+    force: yes
+  when: not env_file_status.stat.exists
+
+- name: Create .env file if it doesn't exist
+  shell: yes y | python3 create-envfile.py --env_type "{{ env_type }}"
+  args:
+    chdir: "{{ compose_project_dir }}"
+  when: not env_file_status.stat.exists
+
+- name: Build Docker images
+  command: docker compose build
+  args:
+    chdir: "{{ compose_project_dir }}"
+
+- name: Start Docker Compose application
+  command: docker compose up -d
+  args:
+    chdir: "{{ compose_project_dir }}"
+
+- name: Ensure services are up and running
+  command: docker compose ps
+  args:
+    chdir: "{{ compose_project_dir }}"

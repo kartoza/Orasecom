@@ -4,4 +4,3 @@
   roles:
     - { role: deployment, tags: ["deploy"] }
     - { role: repository_management, tags: ["repo"] }
-    

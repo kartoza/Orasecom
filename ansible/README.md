@@ -66,3 +66,4 @@ If you want to skip certain operations, such as repository updates, use the --sk
 ```bash
 ansible-playbook -i inventories/ktz/prd/prd.inv playbook.yml --skip-tags "repo"
 ```
+

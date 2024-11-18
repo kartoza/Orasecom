@@ -1,0 +1,6 @@
+---
+docker_compose_version: "2.29.7"
+compose_project_dir: "/opt/orasecom"
+git_repo_url: "https://github.com/kartoza/Orasecom.git"
+git_repo_version: "main"
+env_type: "dev"
