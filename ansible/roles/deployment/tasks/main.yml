@@ -1,40 +1,104 @@
 ---
 - name: Check if Docker is installed
-  shell: |
-    if command -v docker > /dev/null 2>&1; then
-      echo "Docker is installed"
-    else
-      echo "Docker is not installed"
-    fi
+  shell: command -v docker
   register: docker_check
+  changed_when: false
+  failed_when: false
 
-- name: Display Docker installation status
-  debug:
-    msg: "{{ docker_check.stdout }}"
+- name: Install Docker from official repository if not installed
+  vars:
+    arch_mapping:
+      x86_64: amd64
+      aarch64: arm64
+  block:
+    - name: Install required packages for Docker
+      become: yes
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - software-properties-common
+        state: present
+        update_cache: yes
 
-- name: Check if pip is installed
+    - name: Create directory for Docker's GPG key
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker's official GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        keyring: /etc/apt/keyrings/docker.gpg
+        state: present
+
+    - name: Print architecture variables
+      ansible.builtin.debug:
+        msg: "Architecture: {{ ansible_architecture }}, Codename: {{ ansible_lsb.codename }}"
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch={{ arch_mapping[ansible_architecture] | default(ansible_architecture) }}
+          signed-by=/etc/apt/keyrings/docker.gpg]
+          https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+        filename: docker
+        state: present
+
+    - name: Install Docker and related packages
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+
+    - name: Add Docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Enable and start Docker services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - docker.service
+        - containerd.service
+        
+  when: docker_check.stdout == ""
+
+- name: Check if pip3 is installed
   shell: |
-    if command -v pip > /dev/null 2>&1; then
-      echo "pip is installed"
+    if command -v pip3 > /dev/null 2>&1; then
+      echo "pip3 is installed"
     else
-      echo "pip is not installed"
+      echo "pip3 is not installed"
     fi
   register: pip_check
 
-- name: Display pip installation status
+- name: Display pip3 installation status
   debug:
     msg: "{{ pip_check.stdout }}"
 
-- name: Install pip if not installed
+- name: Install pip3 if not installed
   become: yes
   package:
     name: python3-pip
     state: present
-  when: "'pip is not installed' in pip_check.stdout"
+  when: "'pip3 is not installed' in pip_check.stdout"
 
 - name: Check if docker-compose is installed
   shell: |
-    if docker-compose version > /dev/null 2>&1; then
+    if command -v docker-compose > /dev/null 2>&1; then
       echo "docker-compose is installed"
     else
       echo "docker-compose is not installed"
@@ -47,9 +111,18 @@
 
 - name: Install docker-compose if not installed
   become: yes
-  apt:
-    name: docker-compose-plugin
-    state: present
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  when: "'docker-compose is not installed' in docker_compose_check.stdout"
+
+- name: Create symlink to docker-compose in /usr/bin
+  become: yes
+  file:
+    src: /usr/local/bin/docker-compose
+    dest: /usr/bin/docker-compose
+    state: link
   when: "'docker-compose is not installed' in docker_compose_check.stdout"
 
 - name: Check if project directory exists
@@ -67,9 +140,8 @@
 
 - name: Change ownership of project directory
   become: yes
-  ansible.builtin.command:
-    cmd: chown -R "{{ ansible_user }}" "{{ compose_project_dir }}"
-  when: 
+  command: chown -R "{{ ansible_user }}" "{{ compose_project_dir }}"
+  when:
     - not project_dir_status.stat.exists
     - ansible_user is defined
 
@@ -87,7 +159,19 @@
   when: not env_file_status.stat.exists
 
 - name: Create .env file if it doesn't exist
-  shell: yes y | python3 create-envfile.py --env_type "{{ env_type }}"
+  shell: >
+    yes y | python3 create-envfile.py
+    {% if https %} --https{% endif %}
+    --env_type "{{ env_type }}"
+    {% if hostname %} --hostname "{{ hostname }}"{% endif %}
+    {% if email %} --email "{{ email }}"{% endif %}
+    {% if geonodepwd %} --geonodepwd "{{ geonodepwd }}"{% endif %}
+    {% if geoserverpwd %} --geoserverpwd "{{ geoserverpwd }}"{% endif %}
+    {% if pgpwd %} --pgpwd "{{ pgpwd }}"{% endif %}
+    {% if dbpwd %} --dbpwd "{{ dbpwd }}"{% endif %}
+    {% if geodbpwd %} --geodbpwd "{{ geodbpwd }}"{% endif %}
+    {% if clientid %} --clientid "{{ clientid }}"{% endif %}
+    {% if clientsecret %} --clientsecret "{{ clientsecret }}"{% endif %}
   args:
     chdir: "{{ compose_project_dir }}"
   when: not env_file_status.stat.exists
