@@ -112,7 +112,7 @@
 - name: Install docker-compose if not installed
   become: yes
   get_url:
-    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-Linux-x86_64"
     dest: /usr/local/bin/docker-compose
     mode: '0755'
   when: "'docker-compose is not installed' in docker_compose_check.stdout"
@@ -182,7 +182,7 @@
     chdir: "{{ compose_project_dir }}"
 
 - name: Start Docker Compose application
-  command: docker compose up -d
+  command: docker compose up -d --wait
   args:
     chdir: "{{ compose_project_dir }}"
 
