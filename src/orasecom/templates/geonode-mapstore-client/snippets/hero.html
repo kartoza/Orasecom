@@ -19,20 +19,18 @@
 
 <style>
   #gn-hero {
-    background-color: #2DB9DC;
+    background-color: #0C5A8F;
   }
   .msgapi .gn-hero .jumbotron .gn-hero-description h1 {
     font-size: 4rem;
     font-weight: 600;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
   }
   .msgapi .gn-hero .jumbotron {
     max-width: 800px;
   }
   .msgapi .gn-hero .jumbotron .gn-hero-description  {
-    font-size: 1.24rem;
-    font-weight: bolder;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
+    font-size: 1.35rem;
+    font-weight: bold;
   }
 </style>
 {% endblock %}
@@ -44,6 +42,7 @@
                 <h1>ORASECOM GIS Server</h1>
                 {% endwith %}
                 <img src="/static/img/orasecom_logo.png"/>
+                <img src="/static/img/wis-logo-modified.png" width="250"/>
                 {% with jumbotron_welcome_content=custom_theme.jumbotron_welcome_content|default:"sharing geospatial data and maps."|template_trans %}
                 <p>Welcome to the Orange-Senqu River Basin GIS Server. This server shares spatial data and maps related to the Orange-Senqu River Basin under the custodianship of 
                   The Orange-Senqu River Commission (<a href="https://orasecom.org">ORASECOM</a>) to the benefit of all member Basin States, i.e. Botswana, Lesotho, Namibia and South Africa. 
