@@ -1,0 +1,71 @@
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-column">
+      <h3>ADDRESS AND CONTACT</h3>
+      <p>Block A, 66 Corporate Park<br>
+         Cnr Von Willich &amp; Lenchen Streets<br>
+         Centurion, Gauteng<br>
+         South Africa
+      </p>
+      <p>
+        <a href="mailto:lenka.thamae@orasecom.org">lenka.thamae@orasecom.org</a><br>
+        <div>Phone: +27 (0)12 663 6826</div>
+        <span>Fax: +27 (0)12 336 7565</span>
+      </p>
+    </div>
+    
+    <!-- Postal Address Column -->
+    <div class="footer-column">
+      <h3>POSTAL ADDRESS</h3>
+      <p>ORASECOM Secretariat<br>
+         Private Bag X313<br>
+         Pretoria, 0001<br>
+         South Africa
+      </p>
+    </div>
+  </div>
+</footer>
+
+{% include './small_footer.html' %}
+
+<style>
+.site-footer {
+  background-color: #3f3f3f;
+  color: #ffffff;
+  padding: 20px 20px 0px 20px;
+
+}
+
+.footer-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.footer-column {
+  flex: 1 1 300px;
+  margin: 0 20px 20px 0;
+}
+
+.footer-column h3 {
+  color: #E8E76F;
+  margin-bottom: 10px;
+}
+
+.footer-column p,
+.footer-column a,
+.footer-column div,
+.footer-column span {
+  color: #ffffff;
+  line-height: 1.75;
+  text-decoration: none;
+  font-weight: 300;
+}
+
+.footer-column a:hover {
+  text-decoration: underline;
+}
+
+</style>
